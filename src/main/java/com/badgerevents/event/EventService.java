@@ -17,12 +17,25 @@ public class EventService {
     }
 
     @Transactional(readOnly = true)
-    public List<EventSummaryResponse> getUpcomingEvents() {
-        return eventRepository
-                .findAllByStatusAndStartTimeGreaterThanEqualOrderByStartTimeAsc(
+    public List<EventSummaryResponse> getUpcomingEvents(String keyword) {
+        String normalizedKeyword =
+                keyword == null ? "" : keyword.trim();
+
+        Instant now = Instant.now();
+
+        List<Event> events = normalizedKeyword.isBlank()
+                ? eventRepository
+                        .findAllByStatusAndStartTimeGreaterThanEqualOrderByStartTimeAsc(
+                                EventStatus.PUBLISHED,
+                                now
+                        )
+                : eventRepository.searchUpcomingPublishedEvents(
                         EventStatus.PUBLISHED,
-                        Instant.now()
-                )
+                        now,
+                        normalizedKeyword
+                );
+
+        return events
                 .stream()
                 .map(EventSummaryResponse::from)
                 .toList();

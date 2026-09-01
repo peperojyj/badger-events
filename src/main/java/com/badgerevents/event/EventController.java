@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
@@ -20,8 +21,10 @@ public class EventController {
     }
 
     @GetMapping
-    public List<EventSummaryResponse> getEvents() {
-        return eventService.getUpcomingEvents();
+    public List<EventSummaryResponse> getEvents(
+            @RequestParam(defaultValue = "") String keyword
+    ) {
+        return eventService.getUpcomingEvents(keyword);
     }
 
     @GetMapping("/{eventId}")
