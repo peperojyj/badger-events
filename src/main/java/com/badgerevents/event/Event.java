@@ -113,7 +113,7 @@ public class Event {
         );
     }
 
-    public void updateFromImport(
+    public boolean updateFromImport(
             String title,
             String description,
             String category,
@@ -122,6 +122,18 @@ public class Event {
             String location,
             String eventUrl
     ) {
+        boolean changed = !Objects.equals(this.title, title)
+                || !Objects.equals(this.description, description)
+                || !Objects.equals(this.category, category)
+                || !Objects.equals(this.startTime, startTime)
+                || !Objects.equals(this.endTime, endTime)
+                || !Objects.equals(this.location, location)
+                || !Objects.equals(this.eventUrl, eventUrl);
+
+        if (!changed) {
+            return false;
+        }
+
         this.title = Objects.requireNonNull(title);
         this.description = description;
         this.category = category;
@@ -130,6 +142,8 @@ public class Event {
         this.location = location;
         this.eventUrl = eventUrl;
         this.updatedAt = Instant.now();
+
+        return true;
     }
 
     public Long getId() {
