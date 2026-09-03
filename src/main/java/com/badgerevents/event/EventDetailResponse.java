@@ -11,10 +11,16 @@ public record EventDetailResponse(
         Instant endTime,
         String location,
         String eventUrl,
-        EventStatus status
+        EventStatus status,
+        long interestedCount,
+        boolean interestedByMe
 ) {
 
-    public static EventDetailResponse from(Event event) {
+    public static EventDetailResponse from(
+            Event event,
+            long interestedCount,
+            boolean interestedByMe
+    ) {
         return new EventDetailResponse(
                 event.getId(),
                 event.getTitle(),
@@ -24,7 +30,9 @@ public record EventDetailResponse(
                 event.getEndTime(),
                 event.getLocation(),
                 event.getEventUrl(),
-                event.getStatus()
+                event.getStatus(),
+                interestedCount,
+                interestedByMe
         );
     }
 }

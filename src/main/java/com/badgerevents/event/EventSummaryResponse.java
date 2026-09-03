@@ -9,10 +9,16 @@ public record EventSummaryResponse(
         Instant startTime,
         Instant endTime,
         String location,
-        EventStatus status
+        EventStatus status,
+        long interestedCount,
+        boolean interestedByMe
 ) {
 
-    public static EventSummaryResponse from(Event event) {
+    public static EventSummaryResponse from(
+            Event event,
+            long interestedCount,
+            boolean interestedByMe
+    ) {
         return new EventSummaryResponse(
                 event.getId(),
                 event.getTitle(),
@@ -20,7 +26,9 @@ public record EventSummaryResponse(
                 event.getStartTime(),
                 event.getEndTime(),
                 event.getLocation(),
-                event.getStatus()
+                event.getStatus(),
+                interestedCount,
+                interestedByMe
         );
     }
 }

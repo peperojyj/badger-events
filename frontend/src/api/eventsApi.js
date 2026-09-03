@@ -1,21 +1,4 @@
-async function requestJson(path, { signal } = {}) {
-  const response = await fetch(path, {
-    headers: {
-      Accept: 'application/json',
-    },
-    signal,
-  })
-
-  if (!response.ok) {
-    if (response.status === 404) {
-      throw new Error('We could not find that event.')
-    }
-
-    throw new Error('BadgerEvents could not load event data.')
-  }
-
-  return response.json()
-}
+import { ApiError, requestJson } from './apiClient.js'
 
 export function getEvents(keyword = '', signal) {
   const parameters = new URLSearchParams()
@@ -26,14 +9,25 @@ export function getEvents(keyword = '', signal) {
   }
 
   const query = parameters.toString()
+  const path = query ? `/api/events?${query}` : '/api/events'
 
-  const path = query
-    ? `/api/events?${query}`
-    : '/api/events'
-
-  return requestJson(path, { signal })
+  return requestJson(path, {
+    signal,
+    fallbackMessage: 'BadgerEvents could not load event data.',
+  })
 }
 
-export function getEvent(eventId, signal) {
-  return requestJson(`/api/events/${eventId}`, { signal })
+export async function getEvent(eventId, signal) {
+  try {
+    return await requestJson(`/api/events/${eventId}`, {
+      signal,
+      fallbackMessage: 'BadgerEvents could not load event data.',
+    })
+  } catch (error) {
+    if (error instanceof ApiError && error.status === 404) {
+      throw new Error('We could not find that event.', { cause: error })
+    }
+
+    throw error
+  }
 }
