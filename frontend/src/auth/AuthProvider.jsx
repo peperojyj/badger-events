@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { ApiError } from '../api/apiClient.js'
 import {
   getCsrfToken,
@@ -63,7 +63,7 @@ function AuthProvider({ children }) {
     return () => window.clearTimeout(timeoutId)
   }, [notice])
 
-  async function ensureCsrfToken() {
+  const ensureCsrfToken = useCallback(async () => {
     if (csrfToken) {
       return csrfToken
     }
@@ -71,19 +71,21 @@ function AuthProvider({ children }) {
     const csrf = await getCsrfToken()
     setCsrfToken(csrf.token)
     return csrf.token
-  }
+  }, [csrfToken])
 
   async function login(credentials) {
     const token = await ensureCsrfToken()
     const authenticatedUser = await loginUser(credentials, token)
 
+    // 로그인 완료 후 현재 Session 기준 CSRF token을 먼저 받음
+    const refreshedCsrf = await getCsrfToken()
+
+    // 새 token을 저장한 다음 인증 상태를 공개
+    setCsrfToken(refreshedCsrf.token)
     setUser(authenticatedUser)
     setAuthStatus('authenticated')
     setAuthError('')
     setNotice(`Signed in as ${authenticatedUser.displayName}.`)
-
-    const refreshedCsrf = await getCsrfToken()
-    setCsrfToken(refreshedCsrf.token)
 
     return authenticatedUser
   }

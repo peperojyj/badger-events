@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import useAuth from '../auth/useAuth.js'
 import { getEvent } from '../api/eventsApi.js'
+import EventChat from '../components/EventChat.jsx'
 import InterestedButton from '../components/InterestedButton.jsx'
 import StatusPanel from '../components/StatusPanel.jsx'
 import { categoryVisual } from '../utils/categoryVisuals.js'
@@ -141,6 +142,11 @@ function EventDetailPage() {
           )}
         </aside>
       </div>
+      <EventChat
+        key={`${event.id}-${user?.id ?? 'anonymous'}`}
+        eventId={event.id}
+        interestedCount={event.interestedCount}
+      />
     </article>
   )
 }
